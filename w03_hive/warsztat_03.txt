@@ -31,7 +31,7 @@ LATERAL VIEW explode(split(text, ' ')) splitted_words as words
 where text != "";
 
 
-4. Jaki jest najczęściej występujący wyraz ?
+4. Jaki jest najczęściej występujący wyraz ? 
 SELECT * FROM
 (SELECT words,count(*) AS counter FROM pan_tadeusz_rows4
 LATERAL VIEW explode(split(text, ' ')) splitted_words AS words
@@ -42,6 +42,7 @@ LIMIT 10) subselect_aby_usunac_puste_linie
 WHERE words != "";
 
 w	1492
+//Można generować z tego wykresy od razu :O
 
 
 5. Utwórz tabele wedle następującego przykładu:
@@ -71,10 +72,38 @@ CREATE TABLE `users`(
 5a. Załaduj do tabeli dane za pomocą polecenia INSERT INTO SELECT.
 Wykorzystaj do tego tabele pośrednią  opertą na danych z S3.
 Lokalizacja danych: s3://kompleksowe-szkolenie-bigdata/stackoverflow/users
+CREATE TABLE `users_temporary`(
+`id` bigint,
+`reputation` bigint,
+`creationdate` string,
+`displayname` string,
+`lastaccessdate` string,
+`websiteurl` string,
+`location` string,
+`aboutme` string,
+`views` bigint,
+`upvotes` bigint,
+`downvotes` bigint,
+`profileimageurl` string,
+`accountid` bigint)
+ROW FORMAT SERDE
+'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+STORED AS INPUTFORMAT
+'org.apache.hadoop.mapred.TextInputFormat'
+OUTPUTFORMAT
+'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+'s3://kompleksowe-szkolenie-bigdata/stackoverflow/users';
+insert overwrite table users select * from users_temporary ;
 
 
 6. Z jakiego państwa jest najwięcej użytkowników ?
 Hint: wyfiltruj puste pola, nie przejmuj się złożonościa pola location - przyjmujemy jakie jest :)
+SELECT location, count(*) AS Quantity
+FROM users
+GROUP BY location
+ORDER BY Quantity DESC
+
 
 6a. Czy można wykonać wykres rozkładu wystepowania państw w Hue ?
 
