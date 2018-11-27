@@ -1,0 +1,7 @@
+1. Generate private key (.ppk) by Putty Key Generator from .pem
+2. Run EMR - hadoop cluster service
+3. Configure cluster
+4. Putty - 
+	a) use Master public DNS 
+	b) use key from before
+	c) login as: hadoop
