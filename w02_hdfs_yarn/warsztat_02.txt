@@ -3,16 +3,30 @@ Warsztat 02
 HDFS
 
 0. Zaloguj się na NameNode (maszyna master)
+	(using putty ssh)
+	
 0a. Gdzie jest konfiguracja Hadoopa ?
+	/etc/hadoop/conf/
+
 0b. Jaka jest wersja Javy na maszynie ?
+	java -version
+	
 0c. Jak sprawdzić wersję Hadoopa ?
+	hadoop version
 
 1. Zapoznaj się z interfejsem WWW NameNode
 <master_public_dns>:50070
 1a. Gdzie są informacje o datanodach?
+	DataNodes bar xD
+	
 1b. Czy można sprawdzić dane w filesystemie?
+	TAK :O Utilities -> Browse files
+
 1c. Sprawdź route <master_public_dns>:50070/jmx
+	Big as fuck JSON
+
 1d. Jakie statystyki są dostępne ?
+	Failures, snapshots, data usage (in bytes and percent), number of used nodes, history, logs
 
 2. W jakim katalogu przechowywany jest fsimage na NameNode ?
 3(*). W jaki sposób dane są przechowywane na DataNode ? (do tego ćwiczenia musisz się przelogować przez NameNode) / opcjonalne
