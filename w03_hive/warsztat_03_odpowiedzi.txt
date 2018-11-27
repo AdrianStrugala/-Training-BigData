@@ -1,0 +1,142 @@
+Warsztat 03
+
+0. Zaloguj się do Hue.
+Adres: http://master-public-dns-name:8888/
+Hint: w momencie kiedy będzie prośba o utowrzenie usera, utwórz usera o nazwie "hadoop"
+
+1. Przygotuj tabelę na bazie pan_tadeusz.txt z Warsztat 02
+- każda linia niech będzie oddzielnym wierszem
+- dane niech będą przechowywane na HDFS
+Hint: skopiuj dane z S3 w ten sposób za pomocą CLI:
+hdfs dfs -mkdir /user/hadoop/pan_tadeusz
+hdfs dfs -cp s3://kompleksowe-szkolenie-bigdata/warsztat_02/pan_tadeusz.txt /user/hadoop/pan_tadeusz
+
+create table pan_tadeusz (line string) stored as textfile location 'hdfs:///user/hadoop/pan_tadeusz';
+
+2. Ile lini liczy sobie cały zbiór ?
+select count(*) from pan_tadeusz;
+10824
+
+2a. Wykonaj to polecenie SQL za pomocą silnika MapReduce
+set hive.execution.engine=mr;
+select count(*) from pan_tadeusz;
+
+3. Ile unikalnych wyrazów zbiór posiada ? (przełącz się na TEZ)
+set hive.execution.engine=tez;
+select count(distinct words) from pan_tadeusz
+LATERAL VIEW explode(split(line, ' ')) splitted_words as words
+where line != "";
+Wynik: 27511
+
+4. Jaki jest najczęściej występujący wyraz ?
+select * from
+(select words,count(*) as counter from pan_tadeusz
+LATERAL VIEW explode(split(line, ' ')) splitted_words as words
+where line != ""
+group by words
+order by counter desc
+limit 10) subselect_aby_usunac_puste_linie
+where words != "";
+"w" :)
+
+5. Utwórz tabele wedle następującego przykładu:
+CREATE TABLE `users`(
+  `id` bigint,
+  `reputation` bigint,
+  `creationdate` string,
+  `displayname` string,
+  `lastaccessdate` string,
+  `websiteurl` string,
+  `location` string,
+  `aboutme` string,
+  `views` bigint,
+  `upvotes` bigint,
+  `downvotes` bigint,
+  `profileimageurl` string,
+  `accountid` bigint)
+  ROW FORMAT SERDE
+  	  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+  STORED AS INPUTFORMAT
+  	  'org.apache.hadoop.mapred.TextInputFormat'
+  OUTPUTFORMAT
+  	  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+  LOCATION
+  'hdfs:///user/hadoop/users';
+
+5a. Załaduj do tabeli dane za pomocą polecenia INSERT INTO SELECT.
+Wykorzystaj do tego tabele pośrednią  opertą na danych z S3.
+Lokalizacja danych: s3://kompleksowe-szkolenie-bigdata/stackoverflow/users
+CREATE TABLE `users_temporary`(
+`id` bigint,
+`reputation` bigint,
+`creationdate` string,
+`displayname` string,
+`lastaccessdate` string,
+`websiteurl` string,
+`location` string,
+`aboutme` string,
+`views` bigint,
+`upvotes` bigint,
+`downvotes` bigint,
+`profileimageurl` string,
+`accountid` bigint)
+ROW FORMAT SERDE
+'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+STORED AS INPUTFORMAT
+'org.apache.hadoop.mapred.TextInputFormat'
+OUTPUTFORMAT
+'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+'s3://kompleksowe-szkolenie-bigdata/stackoverflow/users';
+insert overwrite table users select * from users_temporary ;
+
+6. Z jakiego państwa jest najwięcej użytkowników?
+Hint: wyfiltruj puste pola, nie przejmuj się złożonościa pola location - przyjmujemy jakie jest :)
+select location,count(*) as counter from users
+where location != ""
+group by location
+order by counter desc
+limit 100;
+
+6a. Czy można wykonać wykres rozkładu państw w Hue ?
+Można :)
+Nad edytorem u góry po prawej stronie jest ikonka grafu.
+
+7. Utwórz partycjonowaną tabelę(EXTERNAL) na podstawie pierwszej cyfry z pola "id". W nowym obiekcie niech będzie kolumna "DisplayName".
+Do tabeli zaimportuj 2 partycje z "id" zaczynającymi sie od "1" oraz od "2".
+Struktura obiektu:
+displayname string
+first_digit string /klucz partycjonowania
+(*)
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.max.dynamic.partitions=10000;
+set hive.exec.max.dynamic.partitions.pernode=10000;
+create external table users_displayname
+(displayname string)
+partitioned by (first_digit string);
+insert into users_displayname partition (first_digit="1")
+select
+displayname
+from users
+where displayname is not null
+and id is not null
+and cast(id as string) like '1%';
+insert into users_displayname partition (first_digit="2")
+select
+displayname
+from users
+where displayname is not null
+and id is not null
+and cast(id as string) like '2%';
+
+7a. Sprawdź w jaki sposób dane zostały ułożone w HDFS (*)
+show partitions users_displayname;
+
+7b. Usuń dowolną partycję (*)
+alter table users_displayname drop partition (first_digit="1");
+show partitions users_displayname;
+
+
+7c. Odtwórz strukturę tabeli za pomocą polecenia MSCK REPAIR TABLE. (*)
+msck repair table users_displayname;
+show partitions users_displayname;

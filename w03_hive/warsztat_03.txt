@@ -1,0 +1,69 @@
+Warsztat 03
+
+0. Zaloguj się do Hue.
+Adres: http://master-public-dns-name:8888/
+Hint: w momencie kiedy będzie prośba o utworzenie usera, utwórz usera o nazwie "hadoop"
+
+1. Przygotuj tabelę na bazie pan_tadeusz.txt z Warsztat 02
+- każda linia niech będzie oddzielnym wierszem
+- dane niech będą przechowywane na HDFS
+Hint: skopiuj dane z S3 w ten sposób za pomocą CLI:
+hdfs dfs -mkdir /user/hadoop/pan_tadeusz
+hdfs dfs -cp s3://kompleksowe-szkolenie-bigdata/warsztat_02/pan_tadeusz.txt /user/hadoop/pan_tadeusz
+
+2. Ile lini liczy sobie cały zbiór ?
+2a. Wykonaj to polecenie SQL za pomocą silnika MapReduce (*)
+
+3. Ile unikalnych wyrazów zbiór posiada ? (przełącz się na TEZ)
+Hint: lateral view
+
+4. Jaki jest najczęściej występujący wyraz ?
+
+5. Utwórz tabele wedle następującego przykładu:
+CREATE TABLE `users`(
+  `id` bigint,
+  `reputation` bigint,
+  `creationdate` string,
+  `displayname` string,
+  `lastaccessdate` string,
+  `websiteurl` string,
+  `location` string,
+  `aboutme` string,
+  `views` bigint,
+  `upvotes` bigint,
+  `downvotes` bigint,
+  `profileimageurl` string,
+  `accountid` bigint)
+  ROW FORMAT SERDE
+  	  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+  STORED AS INPUTFORMAT
+  	  'org.apache.hadoop.mapred.TextInputFormat'
+  OUTPUTFORMAT
+  	  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+  LOCATION
+  'hdfs:///user/hadoop/users';
+
+5a. Załaduj do tabeli dane za pomocą polecenia INSERT INTO SELECT.
+Wykorzystaj do tego tabele pośrednią  opertą na danych z S3.
+Lokalizacja danych: s3://kompleksowe-szkolenie-bigdata/stackoverflow/users
+
+
+6. Z jakiego państwa jest najwięcej użytkowników ?
+Hint: wyfiltruj puste pola, nie przejmuj się złożonościa pola location - przyjmujemy jakie jest :)
+
+6a. Czy można wykonać wykres rozkładu wystepowania państw w Hue ?
+
+(*) 7. Utwórz partycjonowaną tabelę (external). W nowym obiekcie niech będzie kolumna "DisplayName".
+Do tabeli zaimportuj 2 partycje: na podstawie pierwszej cyfry z pola "id" zaczynające sie od 1 oraz od 2.
+Struktura obiektu:
+displayname string
+first_digit string /klucz partycjonowania
+
+Hint:
+  set hive.exec.dynamic.partition.mode=nonstrict;
+  set hive.exec.max.dynamic.partitions=1000000;
+  set hive.exec.max.dynamic.partitions.pernode=1000000;
+
+(*) 7a. Sprawdź w jaki sposób dane zostały ułożone w HDFS (*)
+(*) 7b. Usuń dowolną partycję (*)
+(*) 7c. Odtwórz strukturę tabeli za pomocą polecenia MSCK REPAIR TABLE. (*)
