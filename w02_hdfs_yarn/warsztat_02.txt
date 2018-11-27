@@ -14,6 +14,7 @@ HDFS
 0c. Jak sprawdzić wersję Hadoopa ?
 	hadoop version
 
+	
 1. Zapoznaj się z interfejsem WWW NameNode
 <master_public_dns>:50070
 1a. Gdzie są informacje o datanodach?
@@ -28,6 +29,7 @@ HDFS
 1d. Jakie statystyki są dostępne ?
 	Failures, snapshots, data usage (in bytes and percent), number of used nodes, history, logs
 
+	
 2. W jakim katalogu przechowywany jest fsimage na NameNode ?
   <property>
     <name>dfs.namenode.name.dir</name>
@@ -36,11 +38,13 @@ HDFS
 
   in hdfs-site.xml
 
+  
 3(*). W jaki sposób dane są przechowywane na DataNode ? (do tego ćwiczenia musisz się przelogować przez NameNode) / opcjonalne
 
 Hint:
 aby swobodnie korzystać z tych poleceń przeloguj się na konto hdfs:
 sudo su - hdfs
+
 
 4. Zapoznaj się z poleceniami:
 Co dzięki nim możesz zrobić ?
@@ -57,11 +61,18 @@ Co dzięki nim możesz zrobić ?
 4d. hdfs haadmin
 	manage namenodes - check which is active and standby, make one active etc.
 
+	
 5. Sprawdź:
 5a. ile aktualnie zajmuje cały filesystem HDFS ?
+	~400MB per machine
+	
 5b. ile jest wszystkich plików w HDFS?
+	309988
+	
 5c. Gdzie można znaleźć jeszcze te informacje ?
+	From console, probaby somewhere on web
 
+	
 6. Utwórz lokalnie katalog z kilkoma plikami z randomową treścią - skopiuj go na HDFS
 7. Zmień replikację wszystkich plików na 10
 8. Odczytaj zawartość uprzednio skopiownaych plików bezpośrednio z HDFS
