@@ -11,13 +11,38 @@ Hint: skopiuj dane z S3 w ten sposób za pomocą CLI:
 hdfs dfs -mkdir /user/hadoop/pan_tadeusz
 hdfs dfs -cp s3://kompleksowe-szkolenie-bigdata/warsztat_02/pan_tadeusz.txt /user/hadoop/pan_tadeusz
 
+CREATE TABLE IF NOT EXISTS pan_tadeusz_rows4 (text String)
+ROW FORMAT DELIMITED
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION 'hdfs:///user/hadoop/pan_tadeusz/'
+
+
 2. Ile lini liczy sobie cały zbiór ?
+SELECT COUNT(*) FROM pan_tadeusz_rows4
+
 2a. Wykonaj to polecenie SQL za pomocą silnika MapReduce (*)
 
+
 3. Ile unikalnych wyrazów zbiór posiada ? (przełącz się na TEZ)
-Hint: lateral view
+set hive.execution.engine=tez;
+SELECT COUNT(distinct words) from pan_tadeusz_rows4
+LATERAL VIEW explode(split(text, ' ')) splitted_words as words
+where text != "";
+
 
 4. Jaki jest najczęściej występujący wyraz ?
+SELECT * FROM
+(SELECT words,count(*) AS counter FROM pan_tadeusz_rows4
+LATERAL VIEW explode(split(text, ' ')) splitted_words AS words
+WHERE text != ""
+GROUP BY words
+ORDER BY counter DESC
+LIMIT 10) subselect_aby_usunac_puste_linie
+WHERE words != "";
+
+w	1492
+
 
 5. Utwórz tabele wedle następującego przykładu:
 CREATE TABLE `users`(
