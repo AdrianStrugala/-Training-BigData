@@ -64,9 +64,11 @@ Co dzięki nim możesz zrobić ?
 	
 5. Sprawdź:
 5a. ile aktualnie zajmuje cały filesystem HDFS ?
-	~400MB per machine
+	hdfs dfs -du -h -s /
+	~400MB per machine (400*2=800)
 	
 5b. ile jest wszystkich plików w HDFS?
+	hdfs dfs -count /
 	309988
 	
 5c. Gdzie można znaleźć jeszcze te informacje ?
@@ -74,11 +76,31 @@ Co dzięki nim możesz zrobić ?
 
 	
 6. Utwórz lokalnie katalog z kilkoma plikami z randomową treścią - skopiuj go na HDFS
+	(from odpowiedzi)
+	
+	
 7. Zmień replikację wszystkich plików na 10
-8. Odczytaj zawartość uprzednio skopiownaych plików bezpośrednio z HDFS
-9. Skopiuj katalog z uprzednio przekopiowanymi plikami do lokalnego katalogu /tmp/data_from_hdfs
-10. Usuń cały katalog z HDFS z uprzednio utworzonymi danymi
+	hdfs dfs -setrep -R 10 /. (in this directory)
+	OR
+	<property> 
+		<name>dfs.replication<name> 
+		<value>3<value> 
+		<description>Block Replication<description> 
+	<property>
+	in hdfs-site.xml
 
+	
+8. Odczytaj zawartość uprzednio skopiownaych plików bezpośrednio z HDFS
+	hdfs dfs -cat *
+
+	
+9. Skopiuj katalog z uprzednio przekopiowanymi plikami do lokalnego katalogu /tmp/data_from_hdfs
+	mkdir /tmp/data_from_hdfs
+	hdfs dfs -get /user/hadoop/* /tmp/data_from_hdfs
+
+	
+10. Usuń cały katalog z HDFS z uprzednio utworzonymi danymi
+	hdfs dfs -rm -r  /user/hadoop/*
 
 YARN
 
