@@ -76,7 +76,10 @@ Co dzięki nim możesz zrobić ?
 
 	
 6. Utwórz lokalnie katalog z kilkoma plikami z randomową treścią - skopiuj go na HDFS
-	(from odpowiedzi)
+	for i in `seq 1 20`; do cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10000 | head -n 1 > example_file_$i; done
+	hdfs dfs -ls /user/hadoop
+	hdfs dfs -put ./example_file_* /user/hadoop/
+	hdfs dfs -ls /user/hadoop
 	
 	
 7. Zmień replikację wszystkich plików na 10
@@ -123,19 +126,42 @@ YARN
 
 2. Zapoznaj się z poleceniami:
 2a. yarn application
+	runs application
+	
 2b. yarn jar
+	runs jar
+	
 2c. yarn logs
+	chekcs logs
+	
 2d. yarn queue
+	checks queue
+	
 2e. yarn rmadmin
+	clean process in case of failure
 
+	
 3. Zapoznaj się z poleceniem:
 yarn jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar
 
+
 4. Uruchom przykładową aplikacje obliczająca Pi metodą quasi monte carlo.
+	yarn jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar pi 10 1000
+	
 4a. Zwróć uwagę na to co się dzieje w ResourceManager
+	Application appeared with status, id, etc
+	
 4b. Pobierz oraz zapoznaj się z logami ukończonej aplikacji.
+	yarn logs -applicationId application_1543306082330_0001
+
 4c. Uruchom aplikację pononwnie oraz "zabij" aplikację podczas jej działania (po uruchomieniu joba naciśnij Ctrl-C)
 (parametry do monte carlo: 100 10000)
 
 5. Uruchom program wordCount na pliku pan_tadeusz.txt
 (s3://kompleksowe-szkolenie-bigdata/warsztat_02/pan_tadeusz.txt)
+	hdfs dfs -mkdir /user/hadoop/pan_tadeusz
+	hdfs dfs -cp s3://kompleksowe-szkolenie-bigdata/warsztat_02/pan_tadeusz.txt /user/hadoop/pan_tadeusz
+	hdfs dfs -ls /user/hadoop/pan_tadeusz
+	yarn jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar wordcount
+	yarn jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar wordcount /user/hadoop/pan_tadeusz /user/hadoop/pan_tadeusz_wordcount
+	hdfs dfs -text /user/hadoop/pan_tadeusz_wordcount/* | sort | uniq | sort -k2 -n
