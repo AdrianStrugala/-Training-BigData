@@ -107,10 +107,19 @@ YARN
 1. Zapoznaj się z interfejsem WWW ResourceManagera
 <master_public_dns>:8088
 1a. Gdzie są informacje o nodemanagerach?
+	Nodes bar
+	
 1b. Sprawdź route /jmx
+	Another big fucking json
+	
 1c. Jakie statystyki są dostępne ?
+	Memory used/avalible, containers, virtual cores, 
+	
 1d. Sprawdź route /conf
+	This time big fucking XML
+	
 1e. Gdzie można sprawdzić informacje o schedulerze ?
+	Scheduler bar
 
 2. Zapoznaj się z poleceniami:
 2a. yarn application
