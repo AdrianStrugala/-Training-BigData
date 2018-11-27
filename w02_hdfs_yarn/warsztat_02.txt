@@ -1,0 +1,70 @@
+Warsztat 02
+
+HDFS
+
+0. Zaloguj się na NameNode (maszyna master)
+0a. Gdzie jest konfiguracja Hadoopa ?
+0b. Jaka jest wersja Javy na maszynie ?
+0c. Jak sprawdzić wersję Hadoopa ?
+
+1. Zapoznaj się z interfejsem WWW NameNode
+<master_public_dns>:50070
+1a. Gdzie są informacje o datanodach?
+1b. Czy można sprawdzić dane w filesystemie?
+1c. Sprawdź route <master_public_dns>:50070/jmx
+1d. Jakie statystyki są dostępne ?
+
+2. W jakim katalogu przechowywany jest fsimage na NameNode ?
+3(*). W jaki sposób dane są przechowywane na DataNode ? (do tego ćwiczenia musisz się przelogować przez NameNode) / opcjonalne
+
+Hint:
+aby swobodnie korzystać z tych poleceń przeloguj się na konto hdfs:
+sudo su - hdfs
+
+4. Zapoznaj się z poleceniami:
+4a. hdfs dfs
+4b. hdfs fsck
+4c. hdfs dfsadmin
+4d. hdfs haadmin
+Co dzięki nim możesz zrobić ?
+
+5. Sprawdź:
+5a. ile aktualnie zajmuje cały filesystem HDFS ?
+5b. ile jest wszystkich plików w HDFS?
+5c. Gdzie można znaleźć jeszcze te informacje ?
+
+6. Utwórz lokalnie katalog z kilkoma plikami z randomową treścią - skopiuj go na HDFS
+7. Zmień replikację wszystkich plików na 10
+8. Odczytaj zawartość uprzednio skopiownaych plików bezpośrednio z HDFS
+9. Skopiuj katalog z uprzednio przekopiowanymi plikami do lokalnego katalogu /tmp/data_from_hdfs
+10. Usuń cały katalog z HDFS z uprzednio utworzonymi danymi
+
+
+YARN
+
+1. Zapoznaj się z interfejsem WWW ResourceManagera
+<master_public_dns>:8088
+1a. Gdzie są informacje o nodemanagerach?
+1b. Sprawdź route /jmx
+1c. Jakie statystyki są dostępne ?
+1d. Sprawdź route /conf
+1e. Gdzie można sprawdzić informacje o schedulerze ?
+
+2. Zapoznaj się z poleceniami:
+2a. yarn application
+2b. yarn jar
+2c. yarn logs
+2d. yarn queue
+2e. yarn rmadmin
+
+3. Zapoznaj się z poleceniem:
+yarn jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar
+
+4. Uruchom przykładową aplikacje obliczająca Pi metodą quasi monte carlo.
+4a. Zwróć uwagę na to co się dzieje w ResourceManager
+4b. Pobierz oraz zapoznaj się z logami ukończonej aplikacji.
+4c. Uruchom aplikację pononwnie oraz "zabij" aplikację podczas jej działania (po uruchomieniu joba naciśnij Ctrl-C)
+(parametry do monte carlo: 100 10000)
+
+5. Uruchom program wordCount na pliku pan_tadeusz.txt
+(s3://kompleksowe-szkolenie-bigdata/warsztat_02/pan_tadeusz.txt)

@@ -1,0 +1,132 @@
+Warsztat 02 - rozwiązania
+
+HDFS
+
+
+0. Zaloguj się na NameNode (czyli maszyna master)
+ssh -l hadoop -i ~/studentX.pem <master public dns>
+
+0a. Gdzie jest konfiguracja Hadoopa ?
+/etc/hadoop/conf
+
+0b. Jaka jest wersja Javy na maszynie ?
+java -version
+
+0c. Jak sprawdzić wersję Hadoopa ?
+hadoop version
+
+
+1. Zapoznaj się z interfejsem WWW NameNode
+http://<master_public_dns>:50070
+
+1a. Gdzie są informacje o datanodach?
+Zakładka datanodes
+
+1b. Czy można sprawdzić dane w filesystemie?
+Jest browser filesystemu - Utilites -> browse the file system
+
+1c. Sprawdź route <master_public_dns>:50070/jmx
+
+1d. Jakie statystyki są dostępne ?
+Np. statystyki filesystemu: org.apache.hadoop.hdfs.server.namenode.FSNamesystem
+
+
+
+2. W jakim katalogu przechowywany jest fsimage na NameNode ?
+sudo -u hdfs ls -al /mnt/namenode/current
+
+3(*). W jaki sposób dane są przechowywane na DataNode ?
+W katalogach względem ich stanu - czy sa aktualnie zapisywane przez jakiś proces czy już sfinalizowane
+
+Hint:
+aby swobodnie korzystać z tych poleceń przeloguj się na konto hdfs:
+sudo su - hdfs
+
+4. Zapoznaj się z poleceniami:
+4a. hdfs dfs
+4b. hdfs fsck
+4c. hdfs dfsadmin
+4d. hdfs haadmin
+Co dzięki nim możesz zrobić ?
+
+5. Sprawdź:
+5a. ile aktualnie zajmuje cały filesystem HDFS ?
+hdfs dfs -du -h -s /
+
+5b. ile jest wszystkich plików w HDFS?
+hdfs dfs -count /
+
+5c. Gdzie można znaleźć jeszcze te informacje ?
+- konsola webowa NameNode
+- interfejs JMX
+- polecenia konsoli
+- export FSImage
+
+6. Utwórz lokalnie katalog z kilkoma plikami z randomową treścią - skopiuj go na HDFS
+cd /tmp
+for i in `seq 1 20`; do cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10000 | head -n 1 > example_file_$i; done
+hdfs dfs -ls /user/hadoop
+hdfs dfs -put ./example_file_* /user/hadoop/
+hdfs dfs -ls /user/hadoop
+
+7. Zmień replikację wszystkich plików na 10
+hdfs dfs -setrep -R 10 /user/hadoop/*
+hdfs dfs -ls /user/hadoop/*
+
+8. Odczytaj zawartość uprzednio skopiownaych plików bezpośrednio z HDFS
+hdfs dfs -cat /user/hadoop/example_file_1
+hdfs dfs -text /user/hadoop/example_file_1
+
+9. Skopiuj katalog z uprzednio przekopiowanymi plikami do lokalnego katalogu /tmp/data_from_hdfs
+mkdir /tmp/data_from_hdfs
+hdfs dfs -get /user/hadoop/* /tmp/data_from_hdfs
+ls -al /tmp/data_from_hdfs
+
+10. Usuń cały katalog z HDFS z uprzednio utworzonymi danymi
+hdfs dfs -rm -r -skipTrash /user/hadoop/example_file_*
+
+
+YARN
+
+1. Zapoznaj się z interfejsem WWW ResourceManagera
+http://<master_public_dns>:8088
+1a. Gdzie są informacje o nodemanagerach?
+Zakładka Nodes
+
+1b. Sprawdź route /jmx
+1c. Jakie statystyki są dostępne ?
+1d. Sprawdź route /conf
+Jest tutaj zawarta cała konfiguracja o tym z jakimi parametrami jest uruchomiony proces - najczęściej jest to cała konfiguracja dane klastra Hadoopa
+
+1e. Gdzie można sprawdzić informacje o schedulerze ?
+Zakładka Scheduler
+
+2. Zapoznaj się z poleceniami:
+2a. yarn application
+2b. yarn jar
+2c. yarn logs
+2d. yarn queue
+2e. yarn rmadmin
+
+3. Zapoznaj się z poleceniem:
+yarn jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar
+
+4. Uruchom przykładową aplikacje obliczająca Pi metodą quasi monte carlo.
+yarn jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar pi 10 1000
+
+4a. Zwróć uwagę na to co się dzieje w ResourceManager
+4b. Pobierz oraz zapoznaj się z logami ukończonej aplikacji.
+yarn logs -applicationId application_<XXX>_<XXX>
+
+4c. Uruchom aplikację pononwnie oraz "zabij" aplikację podczas jej działania (po uruchomieniu joba naciśnij Ctrl-C)
+yarn jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar pi 100 10000
+yarn application -list
+yarn application -kill application_<XX>_<XX>
+
+5. Uruchom program wordCount na pliku pan_tadeusz.txt
+hdfs dfs -mkdir /user/hadoop/pan_tadeusz
+hdfs dfs -cp s3://kompleksowe-szkolenie-bigdata/warsztat_02/pan_tadeusz.txt /user/hadoop/pan_tadeusz
+hdfs dfs -ls /user/hadoop/pan_tadeusz
+yarn jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar wordcount
+yarn jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar wordcount /user/hadoop/pan_tadeusz /user/hadoop/pan_tadeusz_wordcount
+hdfs dfs -text /user/hadoop/pan_tadeusz_wordcount/* | sort | uniq | sort -k2 -n
