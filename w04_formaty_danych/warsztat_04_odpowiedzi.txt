@@ -1,0 +1,92 @@
+Warsztat 04 - formaty danych
+
+0. Zaloguj się do Hue
+
+1. Utwórz tabelę oraz załaduj do niej dane:
+CREATE TABLE `users`(
+  `id` bigint,
+  `reputation` bigint,
+  `creationdate` string,
+  `displayname` string,
+  `lastaccessdate` string,
+  `websiteurl` string,
+  `location` string,
+  `aboutme` string,
+  `views` bigint,
+  `upvotes` bigint,
+  `downvotes` bigint,
+  `profileimageurl` string,
+  `accountid` bigint)
+  ROW FORMAT SERDE
+  	  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+  STORED AS INPUTFORMAT
+  	  'org.apache.hadoop.mapred.TextInputFormat'
+  OUTPUTFORMAT
+  	  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+  LOCATION
+  'hdfs:///user/hadoop/users';
+  CREATE TABLE `users_temporary`(
+  `id` bigint,
+  `reputation` bigint,
+  `creationdate` string,
+  `displayname` string,
+  `lastaccessdate` string,
+  `websiteurl` string,
+  `location` string,
+  `aboutme` string,
+  `views` bigint,
+  `upvotes` bigint,
+  `downvotes` bigint,
+  `profileimageurl` string,
+  `accountid` bigint)
+  ROW FORMAT SERDE
+  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+  STORED AS INPUTFORMAT
+  'org.apache.hadoop.mapred.TextInputFormat'
+  OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+  LOCATION
+  's3://kompleksowe-szkolenie-bigdata/stackoverflow/users';
+  insert overwrite table users select * from users_temporary ;
+
+
+
+2. Utwórz nowe tabele, które będą zapisane w następujących formatach:
+- Parquet
+- ORC
+- Avro
+Hint: wykorzystaj konstrukcję CREATE TABLE AS SELECT
+
+
+create table users_parquet
+stored as parquet
+location  'hdfs:///user/hadoop/users_parquet'
+as select * from users;
+
+create table users_avro
+stored as avro
+location  'hdfs:///user/hadoop/users_avro'
+as select * from users;
+
+create table users_orc
+stored as orc
+location  'hdfs:///user/hadoop/users_orc'
+as select * from users;
+
+3. Porównaj rozmiary obietków w HDFS.
+hdfs dfs -du -h /user/hadoop/
+
+4. Sprawdź prędkość zliczania wszystkich rekordów w tabelach z pkt2.
+Zapytanie poprzedz ustawieniem konfiguracyjnym: set hive.compute.query.using.stats=false;
+Przykład:
+set hive.compute.query.using.stats=false;
+select count(*) from <tabela_z_danymi>;
+
+set hive.compute.query.using.stats=false;
+select count(*) from users_avro;
+
+set hive.compute.query.using.stats=false;
+select count(*) from users_orc;
+
+set hive.compute.query.using.stats=false;
+select count(*) from users_parquet;
