@@ -21,6 +21,8 @@ pan_tadeusz_wyrazy.show(10)
 
 pan_tadeusz_wyrazy.distinct().count()
 
+pan_tadeusz_wyrazy.groupBy("col").agg({"col": "count"}).filter(pan_tadeusz_wyrazy.col != "").orderBy("count(col)", ascending=0).first()["count(col)"]
+
 spark.sql("""select count(distinct wyrazy) from (select explode(split(value,' ')) as wyrazy from pan_tadeusz_tabelka)""").show()
 
 pan_tadeusz.write.text("hdfs:///tmp/pan_tadeusz3")
