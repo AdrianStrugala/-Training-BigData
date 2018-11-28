@@ -1,0 +1,10 @@
+Warsztat 05 - Spark
+
+0. Zaloguj się do JupyterHuba:
+Adres: http://master-public-dns-name:9443
+
+Login: jovyan
+Hasło: jupyter
+
+1. Załaduj plik warsztat_05.ipynb
+2. Uruchom załadowany notebook
