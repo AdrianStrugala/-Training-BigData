@@ -1,0 +1,66 @@
+1)
+
+CREATE TABLE IF NOT EXISTS users_xml (text String)
+ROW FORMAT DELIMITED
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+
+
+DROP VIEW users_view;
+CREATE VIEW users_view(
+id,
+reputation, 
+creationdate, 
+displayname,
+lastaccessdate, 
+websiteurl, 
+location, 
+aboutme, 
+views, 
+upvotes, 
+downvotes, 
+profileimageurl, 
+accountid
+  )
+AS SELECT
+xpath_string(text,'//@Id'),
+xpath_string(text,'//@Reputation'),
+xpath_string(text,'//@CreationDate'),
+xpath_string(text,'//@DisplayName'),
+xpath_string(text,'//@LastAccessDate'),
+xpath_string(text,'//@WebsiteUrl'),
+xpath_string(text,'//@Location'),
+xpath_string(text,'//@AboutMe'),
+xpath_string(text,'//@Views'),
+xpath_string(text,'//@UpVotes'),
+xpath_string(text,'//@DownVotes'),
+xpath_string(text,'//@ProfileImageUrl'),
+xpath_string(text,'//@AccountId')
+FROM users_xml
+WHERE text like '%row%';
+
+
+
+
+2)
+CREATE TABLE users_partitioned4
+(id int,
+displayname string,
+reputation string)
+partitioned by (creationdate string)
+
+
+set hive.exec.dynamic.partition.mode=nonstrict;
+insert into users_partitioned4 partition (creationdate)
+select
+  id,
+  displayname,
+  reputation,
+  substr(creationdate, 1, 4) as creationdate
+from
+  users_view;
+
+SELECT * FROM users_partitioned4;
+
+
+3)
