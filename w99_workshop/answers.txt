@@ -64,3 +64,10 @@ SELECT * FROM users_partitioned4;
 
 
 3)
+   1) spark.sql("""select title, viewCount from posts""").orderBy("ViewCount", ascending=0).show(20)
+
+   3) spark.sql("""select body from posts where body like '%big data%' or body like '%hadoop%' """).count()
+   
+   4) spark.sql("""select substr(posts.creationdate,1,4) as year from posts""").groupBy('year').agg({"year": "count"}).orderBy('count(year)', ascending=0).show()
+   
+   5) spark.sql("""select answer.AcceptedAnswerId, posts.OwnerUserId from posts as answer join posts on answer.AcceptedAnswerId = posts.Id """).groupBy('OwnerUserId').agg({"OwnerUserId": "count"}).orderBy('count(OwnerUserId)', ascending=0).show(20)
