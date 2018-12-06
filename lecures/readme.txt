@@ -1,0 +1,32 @@
+Gdzie szukać wiedzy ?
+- szkolenia
+- konferencje
+  - bardzo często przy konferencjach BigData są również prowadzone warsztaty i szkolenia
+  - największe konferencje
+    - Big Data Tech Summit (Warszawa)
+    - DataWorks Summit
+    - Strata Data Conference
+    - PyData
+    - Big Data Spain
+    - Crunch Conference
+    - InfoShare (Gdansk)
+    - https://bigdataldn.com/
+    - http://summit.datamass.io/ (Gdańsk)
+    - https://www.dataengconf.com
+    - https://dataops.barcelona/
+- kursy online
+  - http://udemy.com
+  - http://edx.com
+  - http://www.openuniversity.edu
+  - https://www.coursera.org/
+- książki (zawsze wiedza jest troszkę nie aktualna)
+- blogi firm, które mocno inwestują w technologię :)
+- https://www.meetup.com/  !!!
+- Java User Groups
+- studia podyplmowe
+- wirtualki / środowiska / jak się uruchomić ?
+  - Databricks
+  - Cloudera
+  - Hortonworks
+  - MapR
+  - Teradata
